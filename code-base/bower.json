@@ -1,0 +1,19 @@
+{
+  "name": "code-base bower files",
+  "authors": [
+    "maestro7007"
+  ],
+  "description": "client side scripts & libs",
+  "main": "app.js",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "./code-base/common/external-libs/client/",
+    "test",
+    "tests"
+  ]
+}
