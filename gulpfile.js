@@ -1,5 +1,5 @@
 /**
- * gulpfile js
+ * gulp file js
  */
 
 var gulp = require('gulp');
@@ -10,6 +10,8 @@ var $ = require('gulp-load-plugins')({
 });
 var args = require('yargs');
 var del = require('del');
+var browserSync = require('browser-sync').create();
+
 /**
  * Tasks Array
  */
@@ -24,7 +26,7 @@ var tasks = {
             bowerJson: require(appUtils.constants.paths.bowerJson),
             directory: appUtils.constants.paths.externalLibs,
             ignorePath: '../..' + appUtils.constants.paths.externalLibs
-        }
+        };
 
         appUtils.logger.info('srcPath:' + srcPath);
         appUtils.logger.info('destPath:' + destPath);
@@ -43,10 +45,13 @@ var tasks = {
             appUtils.logger.info('destPath-' + destPath);
 
             return gulp.src(srcPath)
-                .pipe($.rename({
-                    suffix: '.min'
-                }))
                 .pipe($.print())
+                .pipe($.minify({
+                    ext: {
+                        min: '.min.js'
+                    },
+                    noSource: true
+                }))
                 .pipe(gulp.dest(destPath));
         },
 
@@ -58,14 +63,71 @@ var tasks = {
         config: function () {
             var destPath = appUtils.constants.paths.public.scripts;
             var serverConfigPath = appUtils.constants.paths.server.config;
-            appUtils.logger.message('serverconfigpath:' + serverConfigPath);
+            appUtils.logger.message('server config path:' + serverConfigPath);
             appUtils.logger.message('destPath:' + destPath);
             return gulp.src(serverConfigPath)
-                .pipe($.rename({
-                    suffix: '.min'
-                }))
                 .pipe($.print())
+                .pipe($.minify({
+                    ext: {
+                        min: '.min.js'
+                    },
+                    noSource: true
+                }))
                 .pipe(gulp.dest(destPath));
+        },
+
+        start: function () {
+            if (browserSync.active) {
+                appUtils.logger.info('browserSync already running');
+                return;
+            }
+
+            appUtils.logger.info('Browser sync starting...........');
+            browserSync.init({
+                server: {
+                    baseDir: appUtils.constants.appRoot
+                }
+            });
+
+            //var reload = browserSync.reload;
+            gulp.watch([appUtils.constants.paths.utils, appUtils.constants.paths.server.config, appUtils.constants.paths.htmlFiles], ['reload'])
+            // .on('change', function () {
+            //     // appUtils.logger.info('Reloading app server & files.....');
+            //     // reload;
+            //     $.sequence(tasks.app.clean(), tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), function () {
+            //         appUtils.logger.info('Reloading app server & files.....');
+            //         browserSync.reload();
+            //     });
+            // });
+        },
+
+        reload: {
+            app: function () {
+                appUtils.logger.info('reloading & copying app files...');
+                $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.reload.browserSync()]);
+            },
+            browserSync: function () {
+                appUtils.logger.info('reloading browser Sync server & files.....');
+                browserSync.reload();
+            }
+        }
+    },
+
+    lint: {
+        js: function () {
+            var srcPath = [appUtils.constants.paths.utils, appUtils.constants.paths.server.config];
+            var destPath = [appUtils.constants.paths.public.js, appUtils.constants.paths.public.scripts];
+            appUtils.logger.message('Linting started ....');
+            appUtils.logger.info('srcPath-' + srcPath[0] + ',' + srcPath[1]);
+            appUtils.logger.info('destPath-' + destPath[0] + ',' + destPath[1]);
+
+            return gulp.src(srcPath)
+                .pipe($.jshint())
+                .pipe($.jshint.reporter('jshint-stylish', {
+                    verbose: true
+                }))
+                .pipe($.jscs())
+                .pipe(gulp.dest(destPath[0])).pipe(gulp.dest(destPath[1]));
         }
     }
 };
@@ -87,10 +149,14 @@ gulp.task('clean', function () {
 
 gulp.task('start', ['clean'], function () {
     appUtils.logger.info('building & injecting app files...');
-    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies()]);
+    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.start()]);
 });
 
 gulp.task('build', function () {
     appUtils.logger.info('building & copying app files...');
-    $.sequence([tasks.app.build()]);
+    $.sequence([tasks.lint.js(), tasks.app.build()]);
+});
+
+gulp.task('reload', function () {
+    tasks.app.reload.app();
 });
