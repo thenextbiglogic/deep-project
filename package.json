@@ -30,6 +30,7 @@
   "devDependencies": {
     "bower": "^1.8.2",
     "chalk": "^2.3.0",
+    "del": "^3.0.0",
     "g": "^2.0.1",
     "gulp": "^3.9.1",
     "gulp-if": "^2.0.2",
@@ -37,6 +38,8 @@
     "gulp-jshint": "^2.0.4",
     "gulp-load-plugins": "^1.5.0",
     "gulp-print": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sequence": "^0.4.6",
     "gulp-util": "^3.0.8",
     "gutil-color-log": "^1.0.2",
     "jshint": "^2.9.5",

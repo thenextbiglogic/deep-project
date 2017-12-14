@@ -9,7 +9,11 @@ const root = 'code-base',
       utils='/utils/*.util.js',
       controllers='/controllers/*.controller.js',
       externalLibs='/external-libs/client',
-      html='/public/views/*.view.html';
+      html='/public/views/*.view.html',
+      config='/configs',
+      server={
+          config:config+'/*.config.js'
+      };
 
 var constants ={
     appRoot:'/',
@@ -26,7 +30,10 @@ var constants ={
                 css:root+common+'/public/css/',
                 views:root+wwwroot+'/views/',
                 scripts:root+common+'/public/scripts/'
-            }   
+            },
+       server:{
+           config: root+source+ server.config
+       }   
     }
 };
 
