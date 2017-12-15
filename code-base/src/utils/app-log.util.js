@@ -1,23 +1,23 @@
 /**
  * Log object to log message to console or any other data source
  */
-// import the required depnedencies
+// import the required dependencies
 //var usage = require('usage');
 const log =console.log;
 const chalk = require('chalk');
 
 var appLog= {
 message:function (msg) {
-   logMessage(msg,'Message');
+   logMessage(msg,'Message','blue');
   },
   error:function (msg) {
-    logMessage(msg,'Error');
+    logMessage(msg,'Error','red');
     },
   info:function (msg) {  
-    logMessage(msg,'Info');
+    logMessage(msg,'Info','green');
   },
   exception:function (msg) {
-   logMessage(msg,'Exception');
+   logMessage(msg,'Exception','white');
     }
 };
 
@@ -26,10 +26,10 @@ message:function (msg) {
  * @param {*} msg 
  * @param {*} type 
  */
-function logMessage(msg,type)
+function logMessage(msg,type, color)
 {
   log(chalk`
-  ${type}: {red ${msg}}
+  {${color} ${type}}: {red ${msg}}
   Time: {green ${new Date().toString()}}
   `);
 }

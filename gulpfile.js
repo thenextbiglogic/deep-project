@@ -8,10 +8,10 @@ var appUtils = require('./code-base/src/utils/index.util.js');
 var $ = require('gulp-load-plugins')({
     lazy: true
 });
-var args = require('yargs');
+var args = require('yargs').argv;
 var del = require('del');
 var browserSync = require('browser-sync').create();
-
+var path = require('path');
 /**
  * Tasks Array
  */
@@ -20,14 +20,16 @@ var tasks = {
     injectDependencies: function () {
         var wiredep = require('wiredep').stream;
         appUtils.logger.info('injecting dependencies');
+        var bowerDirPath = path.join(__dirname,appUtils.constants.paths.externalLibs);
         var srcPath = appUtils.constants.paths.htmlFiles;
         var destPath = appUtils.constants.paths.public.views;
         var options = {
             bowerJson: require(appUtils.constants.paths.bowerJson),
-            directory: appUtils.constants.paths.externalLibs,
-            ignorePath: '../..' + appUtils.constants.paths.externalLibs
+            directory:bowerDirPath ,
+            ignorePath: '../../external-libs/client'
         };
 
+        appUtils.logger.info('bower dir path:' + bowerDirPath);
         appUtils.logger.info('srcPath:' + srcPath);
         appUtils.logger.info('destPath:' + destPath);
 
@@ -76,29 +78,20 @@ var tasks = {
                 .pipe(gulp.dest(destPath));
         },
 
-        start: function () {
-            if (browserSync.active) {
-                appUtils.logger.info('browserSync already running');
-                return;
-            }
-
-            appUtils.logger.info('Browser sync starting...........');
-            browserSync.init({
-                server: {
-                    baseDir: appUtils.constants.appRoot
+        start: function (verbose) {
+            if (verbose) {
+                if (browserSync.active) {
+                    appUtils.logger.info('browserSync already running');
+                    return;
                 }
-            });
 
-            //var reload = browserSync.reload;
-            gulp.watch([appUtils.constants.paths.utils, appUtils.constants.paths.server.config, appUtils.constants.paths.htmlFiles], ['reload'])
-            // .on('change', function () {
-            //     // appUtils.logger.info('Reloading app server & files.....');
-            //     // reload;
-            //     $.sequence(tasks.app.clean(), tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), function () {
-            //         appUtils.logger.info('Reloading app server & files.....');
-            //         browserSync.reload();
-            //     });
-            // });
+                appUtils.logger.info('Browser sync starting...........');
+                browserSync.init({
+                    proxy: 'localhost:1304'
+                });
+
+                gulp.watch([appUtils.constants.paths.utils, appUtils.constants.paths.server.config, appUtils.constants.paths.htmlFiles], ['reload'])
+            }
         },
 
         reload: {
@@ -149,7 +142,8 @@ gulp.task('clean', function () {
 
 gulp.task('start', ['clean'], function () {
     appUtils.logger.info('building & injecting app files...');
-    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.start()]);
+    var verbose = args.verbose;
+    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.start(verbose || false)]);
 });
 
 gulp.task('build', function () {

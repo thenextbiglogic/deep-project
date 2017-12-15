@@ -1,12 +1,21 @@
 {
-  "name": "code-base bower files",
-  "authors": [
-    "maestro7007"
-  ],
-  "description": "client side scripts & libs",
+  "name": "project-deep",
+  "description": "a deep learning project",
   "main": "app.js",
-  "license": "MIT",
-  "homepage": "",
+  "authors": [
+    "Maestro7007"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "machine",
+    "learning",
+    "deep",
+    "learning",
+    "python",
+    "node",
+    "azure"
+  ],
+  "homepage": "https://github.com/thenextbiglogic/deep-project",
   "private": true,
   "ignore": [
     "**/.*",
@@ -32,11 +41,8 @@
       ]
     }
   },
-  "scripts": {
-    "postinstall": "gulp bower"
-  },
   "dependencies": {
-    "font-awesome": "^4.7.0",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0"
   }
 }
