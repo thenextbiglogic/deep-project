@@ -42,7 +42,7 @@ var constants = {
         public: {
             base:'/public',
             js: root + common + '/public/js/',
-            css:root+ common + '/public/css/style.app.min.css',
+            css:root+ common + '/public/css/',
             views: root + wwwroot + '/views/',
             scripts: root + common + '/public/scripts/',
             styles: root + common + '/public/css/*.app.css'
