@@ -32,6 +32,7 @@ var constants = {
             public: '../../common/public',
             styles: '../..//common/public/css'
         },
+        static:'code-base/common',
         common: common,
         bowerJson: './bower.json',
         controllers: root + source + controllers,

@@ -23,6 +23,8 @@ var tasks = {
         var bowerDirPath = path.join(__dirname,appUtils.constants.paths.externalLibs);
         var srcPath = appUtils.constants.paths.htmlFiles;
         var destPath = appUtils.constants.paths.public.views;
+        var customStylePath = appUtils.constants.paths.public.css;
+      
         var options = {
             bowerJson: require(appUtils.constants.paths.bowerJson),
             directory:bowerDirPath ,
@@ -33,8 +35,13 @@ var tasks = {
         appUtils.logger.info('srcPath:' + srcPath);
         appUtils.logger.info('destPath:' + destPath);
 
+        appUtils.logger.info('injecting custom dependencies');
+        appUtils.logger.info('custom style path::' + customStylePath);
         return gulp.src(srcPath)
             .pipe(wiredep(options))
+            .pipe($.inject(gulp.src(customStylePath,{read:false}),{
+                ignorePath:appUtils.constants.paths.static
+            }))
             .pipe($.print())
             .pipe(gulp.dest(destPath));
     },

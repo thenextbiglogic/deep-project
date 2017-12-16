@@ -66,7 +66,7 @@ var server = {
           utils.Logger.info(allowedRoutes['views']);
           //app.use(express.static(allowedRoutes['libs']));
           //app.use(express.static(allowedRoutes['views']));
-          app.use(express.static(path.join(dirname,'src/styles')));
+          app.use(express.static(utils.Constants.paths.static));
           app.use(express.static(path.join(dirname, utils.Constants.paths.common)));
           app.use(express.static(path.join(dirname, utils.Constants.paths.externalLibs)));
           app.use(express.static(path.join(dirname, utils.Constants.paths.public.views)));
