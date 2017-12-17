@@ -115,9 +115,24 @@ Object.defineProperty(server, 'name', {
 
 server.Serve = function (options) {
   if (options.route === utils.Constants.appRoot) {
-     var router = route.get('home');
-    console.log(Object.keys(router));
     app.route(options.route).get(function(req,res){
+      var router = route.get('home');
+      utils.Logger.info(req.url);
+      utils.Logger.info(router.name+','+router.LastAccessed);
+      router.actions.get(req,res,dirname);
+    });
+
+    app.route('/node').get(function(req,res){
+      var router = route.get('node');
+      utils.Logger.info(req.url);
+      utils.Logger.info(router.name+','+router.LastAccessed);
+      router.actions.get(req,res,dirname);
+    });
+
+    app.route('/home').get(function(req,res){
+      var router = route.get('home');
+      utils.Logger.info(req.url);
+      utils.Logger.info(router.name+','+router.LastAccessed);
       router.actions.get(req,res,dirname);
     });
   } else {

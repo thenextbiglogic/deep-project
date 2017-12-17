@@ -11,14 +11,19 @@ const root = './code-base',
     controllers = '/controllers/*.controller.js',
     routes = '/routes/*.route.js',
     externalLibs = '/external-libs/client',
-    html = '/views/*.view.*',
+    html = {
+        views: '/views/*.view.*',
+        templates: '/views/**/*.view.*',
+        layout: '/views/**/header.view.*',
+        all: '/views/**'
+    },
     css = '/styles/*.app.css',
     config = '/configs',
     server = {
         config: config + '/*.config.js'
     },
     path = require('path'),
-    viewType='ejs';
+    viewType = 'ejs';
 
 var constants = {
     appRoot: '/',
@@ -55,7 +60,12 @@ var constants = {
         server: {
             config: root + source + server.config
         },
-        htmlFiles: root + common + '/public' + html
+        htmlFiles: {
+            layout: root + common + '/public' + html.layout,
+            views: root + common + '/public' + html.views,
+            templates: root.common + '/public' + html.templates,
+            all: root + common + '/public' + html.all
+        }
     },
     appRoutes: {
         allowed: function (dirname) {
@@ -117,7 +127,7 @@ var constants = {
 
     AppRegex: {
         Controller: '..\\js\\{0}.controller.min.js',
-        View: '{0}.view.*',
+        View: '{1}\\{0}.view.*',
         Util: '{0}.util.*',
         Config: '{0}.config.*'
     }

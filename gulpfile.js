@@ -22,14 +22,13 @@ var tasks = {
     injectDependencies: function () {
         var wiredep = require('wiredep').stream;
         appUtils.Logger.info('injecting dependencies');
-        var bowerDirPath = path.join(__dirname,appUtils.Constants.paths.externalLibs);
-        var srcPath = appUtils.Constants.paths.htmlFiles;
+        var bowerDirPath = path.join(__dirname, appUtils.Constants.paths.externalLibs);
+        var srcPath = appUtils.Constants.paths.htmlFiles.layout;
         var destPath = appUtils.Constants.paths.public.views;
         var customStylePath = appUtils.Constants.paths.public.styles;
-      
         var options = {
             bowerJson: require(appUtils.Constants.paths.bowerJson),
-            directory:bowerDirPath ,
+            directory: bowerDirPath,
             ignorePath: appUtils.Constants.paths.ignorePaths.client
         };
 
@@ -41,17 +40,18 @@ var tasks = {
         appUtils.Logger.info('custom style path::' + customStylePath);
         return gulp.src(srcPath)
             .pipe(wiredep(options))
-            
-            .pipe($.inject(gulp.src(customStylePath,{read:false}),{
-                ignorePath:appUtils.Constants.paths.static
+
+            .pipe($.inject(gulp.src(customStylePath, {
+                read: false
+            }), {
+                ignorePath: appUtils.Constants.paths.static
             }))
             .pipe($.print())
             .pipe(gulp.dest(destPath));
     },
 
-    minify:{
-        css:function()
-        {
+    minify: {
+        css: function () {
             var srcPath = appUtils.Constants.paths.cssFiles;
             var destPath = appUtils.Constants.paths.public.css;
 
@@ -64,12 +64,26 @@ var tasks = {
                 .pipe(gulp.dest(destPath));
         }
     },
+    copy: {
+        views: function () {
+            var srcPath = [appUtils.Constants.paths.htmlFiles.all,'!'+ appUtils.Constants.paths.htmlFiles.layout]; 
+            var destPath = appUtils.Constants.paths.public.views;
+
+            appUtils.Logger.info('srcPath-' + srcPath[0]);
+            appUtils.Logger.info('destPath-' + destPath);
+            appUtils.Logger.info('Copying view files');
+            return gulp.src(srcPath)
+                .pipe($.print())
+                .pipe(gulp.dest(destPath));
+        }
+    },
+
     app: {
         build: function () {
-            var srcPath = [appUtils.Constants.paths.utils,appUtils.Constants.paths.routes,appUtils.Constants.paths.controllers];
+            var srcPath = [appUtils.Constants.paths.utils, appUtils.Constants.paths.routes, appUtils.Constants.paths.controllers];
             var destPath = appUtils.Constants.paths.public.js;
 
-            appUtils.Logger.info('srcPath-' + srcPath[0]+','+srcPath[1]+','+srcPath[2]);
+            appUtils.Logger.info('srcPath-' + srcPath[0] + ',' + srcPath[1] + ',' + srcPath[2]);
             appUtils.Logger.info('destPath-' + destPath);
 
             return gulp.src(srcPath)
@@ -85,7 +99,7 @@ var tasks = {
 
         clean: function () {
             appUtils.Logger.info('cleaning files...');
-            return del([appUtils.Constants.paths.public.js,appUtils.Constants.paths.public.styles, appUtils.Constants.paths.public.scripts, appUtils.Constants.paths.public.views]);
+            return del([appUtils.Constants.paths.public.js, appUtils.Constants.paths.public.styles, appUtils.Constants.paths.public.scripts, appUtils.Constants.paths.public.views]);
         },
 
         config: function () {
@@ -166,15 +180,15 @@ gulp.task('clean', function () {
     return tasks.app.clean();
 });
 
-gulp.task('minify',['clean'],function(){
- return tasks.minify.css();
+gulp.task('minify', ['clean'], function () {
+    return tasks.minify.css();
 });
 
 gulp.task('start', ['minify'], function () {
     appUtils.Logger.info('building & injecting app files...');
     var verbose = args.verbose;
     $.wait(1500);
-    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.start(verbose || false)]);
+    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(),tasks.copy.views(), tasks.app.start(verbose || false)]);
 });
 
 gulp.task('build', function () {

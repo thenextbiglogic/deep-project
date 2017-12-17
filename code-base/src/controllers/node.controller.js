@@ -10,12 +10,12 @@ const utils = {
 },
 path = require('path');
 
-var name = 'Home',
-    viewPath = 'home/';
+var name = 'Node',
+    viewPath = 'node/';
 
 var homeController = {
-    Name: 'Home',
-    ViewPath: '/Home/',
+    Name: 'Node',
+    ViewPath: 'node/',
     Configure: function (app, route) {
         var check = utils.Exception.Handle(app);
         if (check.Status === utils.Status.OK && check.Message === utils.Constants.Empty) {
@@ -26,11 +26,11 @@ var homeController = {
     },
 
     Get: function (req, res,dirname) {
-        res.render(path.join(dirname, utils.Constants.paths.public.views) +viewPath+ '/index.view.ejs', {
-            title: 'Home Controller',
+        res.render(path.join(dirname, utils.Constants.paths.public.views) +viewPath+ 'index.view.ejs', {
+            title: 'Node Controller',
             name: name,
             data: {
-              Message: 'Response from Home Controller',
+              Message: 'Response from Node Controller',
               Time: new Date().toString()
             }
           });
