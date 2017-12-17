@@ -24,8 +24,11 @@
   "license": "ISC",
   "private": true,
   "dependencies": {
+    "ejs-locals": "^1.0.2",
     "express": "^4.16.2",
-    "node-usage": "0.0.3"
+    "lodash": "^4.17.4",
+    "node-usage": "0.0.3",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "bower": "^1.8.2",

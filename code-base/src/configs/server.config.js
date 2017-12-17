@@ -1,21 +1,32 @@
 /**
  * Private variables
  */
-var version = '1.0.0.0',
-  name = 'Project Maestro ',
-  utils = {
+var fs = require('fs');
+const utils = {
     Logger: require('../js/app-log.util.min'),
-    Constants: require('../js/app-contants.util.min')
+    Constants: require('../js/app-contants.util.min'),
+    Exception:require('../js/app-exception.util.min')
   },
-  viewEngineSet = false,
-  dirname = __dirname,
-  allowedRoutes = [];
 
-const express = require('express'),
+  //require(fs.existsSync('./code-base/common/public/js/index.util.min') ? './code-base/common/public/js/index.util.min' : '../utils/index.util.js'),
+  route = require('../js/app.route.min'),
+  //require(fs.existsSync('./code-base/common/public/js/app.route.min') ? './code-base/common/public/js/app.route.min' : '../routes/app.route.js'),
+  express = require('express'),
   port = process.env.port || 1304,
   app = express(),
   viewEngine = utils.Constants.view.engine,
-  path = require('path');
+  path = require('path'),
+  ejs = require('ejs-locals');
+
+var version = utils.Constants.Server.Properties.version,
+  name = utils.Constants.Server.Properties.Name,
+  project = {
+    name: utils.Constants.Project.Properties.Name
+  },
+  viewEngineSet = utils.Constants.ViewEngine.Properties.IsSet,
+  dirname = __dirname,
+  allowedRoutes = [],
+  routeList = [];
 
 var server = {
 
@@ -31,9 +42,8 @@ var server = {
 
   configure: {
     app: function (options) {
-      if (!options) {
-        utils.Logger.info('Options not set. Cannot initialize Express Server');
-      } else {
+      var check = utils.Exception.Handle(options);
+      if (check.Status && check.Message === utils.Constants.Empty) {
         if (!options.route) {
           options.route = utils.Constants.appRoot;
         }
@@ -41,40 +51,44 @@ var server = {
           dirname = options.dirname;
         }
         if (options.useViewEngine) {
-          utils.Logger.info('Setting up views path to :' + dirname);
+          utils.Logger.info(utils.Constants.ViewEngine.Messages[0].replace('{0}', dirname));
           this.views(dirname);
         }
 
-        utils.Logger.info('Configuring Express server');
-        utils.Logger.info('Starting Express server');
+        utils.Logger.info(utils.Constants.Server.Messages[1].replace('{0}', server.name));
+        // configure routes
+        route.configure();
+
         server.Serve(options);
         if (!options.port) {
           options.port = port;
         }
         app.listen(options.port, () => {
+          utils.Logger.info(utils.Constants.Server.Messages[0].replace('{0}', server.name));
           utils.Logger.info('Listening on port:' + options.port);
         });
+
+
+      } else {
+        utils.Logger.info(utils.Constants.Server.Messages[6].replace('{0}', name).replace('{1}', arguments[0]));
       }
     },
 
     views: function (dirname) {
-      allowedRoutes = utils.Constants.routes.allowed(dirname);
-      if (!app) {
-        utils.Logger.error('app not initialized');
-      } else {
+      allowedRoutes = utils.Constants.appRoutes.allowed(dirname);
+      var check = utils.Exception.Handle(app);
+      if (check.Status && check.Message === utils.Constants.Empty) {
         if (!viewEngineSet) {
           utils.Logger.info(allowedRoutes['views']);
-          //app.use(express.static(allowedRoutes['libs']));
-          //app.use(express.static(allowedRoutes['views']));
           app.use(express.static(utils.Constants.paths.static));
-          app.use(express.static(path.join(dirname, utils.Constants.paths.common)));
-          app.use(express.static(path.join(dirname, utils.Constants.paths.externalLibs)));
-          app.use(express.static(path.join(dirname, utils.Constants.paths.public.views)));
-          app.set('views', allowedRoutes['views']);
-          app.engine('html', require('ejs').renderFile);
-          app.set('view engine', 'html');
+          app.set(utils.Constants.view.base, allowedRoutes[utils.Constants.view.base]);
+          app.engine(utils.Constants.view.type, ejs);
+          app.set(utils.Constants.view.engine, utils.Constants.view.type);
           viewEngineSet = true;
+          utils.Constants.ViewEngine.Properties.IsSet = viewEngineSet;
         }
+      } else {
+        utils.Logger.error(utils.Constants.Server.Message[4].replace('{0}', name));
       }
     }
   }
@@ -100,37 +114,34 @@ Object.defineProperty(server, 'name', {
 });
 
 server.Serve = function (options) {
-  app.get(options.route, function (req, res) {
-    var msg = 'Express Server Started. Proxying through browser Sync API';
-    utils.Logger.info(msg);
-    if (!viewEngineSet && options.useViewEngine) {
-      msg += 'View Engine not set';
-      utils.Logger.info(msg);
-      res.send(msg);
-    } else if (options.useViewEngine) {
-      res.render(path.join(dirname, utils.Constants.paths.public.views) + 'index.view.html', {
-        title: 'Home',
-        name:name,
-        data: {
-          Message:msg,
-          Time: new Date().toString()
-        }
-      });
-    } else {
-      res.send(msg);
-    }
-  });
-  app.get('/123', function (req, res) {
-    var msg = 'Serving on different url. URL:' + req.url;
-    utils.Logger.info(msg);
-    if (!viewEngineSet) {
-      msg += 'View Engine not set';
-      utils.Logger.info(msg);
-      res.sendFile(utils.Constants.paths.public.views + 'index.view.html');
-    } else {
-      res.send(msg);
-    }
-  });
+  if (options.route === utils.Constants.appRoot) {
+     var router = route.get('home');
+    console.log(Object.keys(router));
+    app.route(options.route).get(function(req,res){
+      router.actions.get(req,res,dirname);
+    });
+  } else {
+    app.get(options.route, function (req, res) {
+      var msg = utils.Constants.Server.Message[6];
+      utils.Logger.info();
+      if (!viewEngineSet && options.useViewEngine) {
+        msg += utils.Constants.ViewEngine.Message[1];
+        utils.Logger.info(msg);
+        res.send(msg);
+      } else if (options.useViewEngine) {
+        res.render(path.join(dirname, utils.Constants.paths.public.views) + 'index.view.ejs', {
+          title: 'Home',
+          name: name,
+          data: {
+            Message: msg,
+            Time: new Date().toString()
+          }
+        });
+      } else {
+        res.send(msg);
+      }
+    });
+  }
 };
 
 module.exports = server;

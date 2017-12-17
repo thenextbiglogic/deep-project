@@ -21,29 +21,29 @@ var cleanCSS = require('gulp-clean-css');
 var tasks = {
     injectDependencies: function () {
         var wiredep = require('wiredep').stream;
-        appUtils.logger.info('injecting dependencies');
-        var bowerDirPath = path.join(__dirname,appUtils.constants.paths.externalLibs);
-        var srcPath = appUtils.constants.paths.htmlFiles;
-        var destPath = appUtils.constants.paths.public.views;
-        var customStylePath = appUtils.constants.paths.public.styles;
+        appUtils.Logger.info('injecting dependencies');
+        var bowerDirPath = path.join(__dirname,appUtils.Constants.paths.externalLibs);
+        var srcPath = appUtils.Constants.paths.htmlFiles;
+        var destPath = appUtils.Constants.paths.public.views;
+        var customStylePath = appUtils.Constants.paths.public.styles;
       
         var options = {
-            bowerJson: require(appUtils.constants.paths.bowerJson),
+            bowerJson: require(appUtils.Constants.paths.bowerJson),
             directory:bowerDirPath ,
-            ignorePath: appUtils.constants.paths.ignorePaths.client
+            ignorePath: appUtils.Constants.paths.ignorePaths.client
         };
 
-        appUtils.logger.info('bower dir path:' + bowerDirPath);
-        appUtils.logger.info('srcPath:' + srcPath);
-        appUtils.logger.info('destPath:' + destPath);
+        appUtils.Logger.info('bower dir path:' + bowerDirPath);
+        appUtils.Logger.info('srcPath:' + srcPath);
+        appUtils.Logger.info('destPath:' + destPath);
 
-        appUtils.logger.info('injecting custom dependencies');
-        appUtils.logger.info('custom style path::' + customStylePath);
+        appUtils.Logger.info('injecting custom dependencies');
+        appUtils.Logger.info('custom style path::' + customStylePath);
         return gulp.src(srcPath)
             .pipe(wiredep(options))
             
             .pipe($.inject(gulp.src(customStylePath,{read:false}),{
-                ignorePath:appUtils.constants.paths.static
+                ignorePath:appUtils.Constants.paths.static
             }))
             .pipe($.print())
             .pipe(gulp.dest(destPath));
@@ -52,11 +52,11 @@ var tasks = {
     minify:{
         css:function()
         {
-            var srcPath = appUtils.constants.paths.cssFiles;
-            var destPath = appUtils.constants.paths.public.css;
+            var srcPath = appUtils.Constants.paths.cssFiles;
+            var destPath = appUtils.Constants.paths.public.css;
 
-            appUtils.logger.info('srcPath-' + srcPath);
-            appUtils.logger.info('destPath-' + destPath);
+            appUtils.Logger.info('srcPath-' + srcPath);
+            appUtils.Logger.info('destPath-' + destPath);
 
             return gulp.src(srcPath)
                 .pipe($.print())
@@ -66,11 +66,11 @@ var tasks = {
     },
     app: {
         build: function () {
-            var srcPath = appUtils.constants.paths.utils;
-            var destPath = appUtils.constants.paths.public.js;
+            var srcPath = [appUtils.Constants.paths.utils,appUtils.Constants.paths.routes,appUtils.Constants.paths.controllers];
+            var destPath = appUtils.Constants.paths.public.js;
 
-            appUtils.logger.info('srcPath-' + srcPath);
-            appUtils.logger.info('destPath-' + destPath);
+            appUtils.Logger.info('srcPath-' + srcPath[0]+','+srcPath[1]+','+srcPath[2]);
+            appUtils.Logger.info('destPath-' + destPath);
 
             return gulp.src(srcPath)
                 .pipe($.print())
@@ -84,15 +84,15 @@ var tasks = {
         },
 
         clean: function () {
-            appUtils.logger.info('cleaning files...');
-            return del([appUtils.constants.paths.public.js,appUtils.constants.paths.public.styles, appUtils.constants.paths.public.scripts, appUtils.constants.paths.public.views]);
+            appUtils.Logger.info('cleaning files...');
+            return del([appUtils.Constants.paths.public.js,appUtils.Constants.paths.public.styles, appUtils.Constants.paths.public.scripts, appUtils.Constants.paths.public.views]);
         },
 
         config: function () {
-            var destPath = appUtils.constants.paths.public.scripts;
-            var serverConfigPath = appUtils.constants.paths.server.config;
-            appUtils.logger.message('server config path:' + serverConfigPath);
-            appUtils.logger.message('destPath:' + destPath);
+            var destPath = appUtils.Constants.paths.public.scripts;
+            var serverConfigPath = appUtils.Constants.paths.server.config;
+            appUtils.Logger.message('server config path:' + serverConfigPath);
+            appUtils.Logger.message('destPath:' + destPath);
             return gulp.src(serverConfigPath)
                 .pipe($.print())
                 .pipe($.minify({
@@ -107,26 +107,26 @@ var tasks = {
         start: function (verbose) {
             if (verbose) {
                 if (browserSync.active) {
-                    appUtils.logger.info('browserSync already running');
+                    appUtils.Logger.info('browserSync already running');
                     return;
                 }
 
-                appUtils.logger.info('Browser sync starting...........');
+                appUtils.Logger.info('Browser sync starting...........');
                 browserSync.init({
                     proxy: 'localhost:1304'
                 });
 
-                gulp.watch([appUtils.constants.paths.utils, appUtils.constants.paths.server.config, appUtils.constants.paths.htmlFiles], ['reload'])
+                gulp.watch([appUtils.Constants.paths.utils, appUtils.Constants.paths.server.config, appUtils.Constants.paths.htmlFiles], ['reload'])
             }
         },
 
         reload: {
             app: function () {
-                appUtils.logger.info('reloading & copying app files...');
+                appUtils.Logger.info('reloading & copying app files...');
                 $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.reload.browserSync()]);
             },
             browserSync: function () {
-                appUtils.logger.info('reloading browser Sync server & files.....');
+                appUtils.Logger.info('reloading browser Sync server & files.....');
                 browserSync.reload();
             }
         }
@@ -134,11 +134,11 @@ var tasks = {
 
     lint: {
         js: function () {
-            var srcPath = [appUtils.constants.paths.utils, appUtils.constants.paths.server.config];
-            var destPath = [appUtils.constants.paths.public.js, appUtils.constants.paths.public.scripts];
-            appUtils.logger.message('Linting started ....');
-            appUtils.logger.info('srcPath-' + srcPath[0] + ',' + srcPath[1]);
-            appUtils.logger.info('destPath-' + destPath[0] + ',' + destPath[1]);
+            var srcPath = [appUtils.Constants.paths.utils, appUtils.Constants.paths.server.config];
+            var destPath = [appUtils.Constants.paths.public.js, appUtils.Constants.paths.public.scripts];
+            appUtils.Logger.message('Linting started ....');
+            appUtils.Logger.info('srcPath-' + srcPath[0] + ',' + srcPath[1]);
+            appUtils.Logger.info('destPath-' + destPath[0] + ',' + destPath[1]);
 
             return gulp.src(srcPath)
                 .pipe($.jshint())
@@ -155,7 +155,7 @@ var tasks = {
  * gulp tasks
  */
 gulp.task('default', function () {
-    appUtils.logger.info('gulp started at:-' + new Date());
+    appUtils.Logger.info('gulp started at:-' + new Date());
 });
 
 gulp.task('inject', function () {
@@ -171,14 +171,14 @@ gulp.task('minify',['clean'],function(){
 });
 
 gulp.task('start', ['minify'], function () {
-    appUtils.logger.info('building & injecting app files...');
+    appUtils.Logger.info('building & injecting app files...');
     var verbose = args.verbose;
     $.wait(1500);
     $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(), tasks.app.start(verbose || false)]);
 });
 
 gulp.task('build', function () {
-    appUtils.logger.info('building & copying app files...');
+    appUtils.Logger.info('building & copying app files...');
     $.sequence([tasks.lint.js(), tasks.app.build()]);
 });
 
