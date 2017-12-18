@@ -78,6 +78,28 @@ var tasks = {
         }
     },
 
+    server:{
+        nodemon:function(verbose)
+        {
+         var options={
+             delay:5000,
+             server:appUtils.Constants.paths.server.base,
+             env:{
+                 'PORT':appUtils.Constants.paths.server.port,
+             'NODE_ENV':'build'
+             },
+             watch:appUtils.Constants.paths.watchFiles
+         };
+
+         appUtils.Logger.message('Starting Nodemon server on port: '+ appUtils.Constants.paths.server.port);
+         $.sequence([ $.nodemon(options)]);
+        },
+        native:function()
+        {
+           
+        }
+    },
+
     app: {
         build: function () {
             var srcPath = [appUtils.Constants.paths.utils, appUtils.Constants.paths.routes, appUtils.Constants.paths.controllers];
@@ -119,6 +141,7 @@ var tasks = {
         },
 
         start: function (verbose) {
+            tasks.server.native();
             if (verbose) {
                 if (browserSync.active) {
                     appUtils.Logger.info('browserSync already running');
@@ -130,7 +153,7 @@ var tasks = {
                     proxy: 'localhost:1304'
                 });
 
-                gulp.watch([appUtils.Constants.paths.utils, appUtils.Constants.paths.server.config, appUtils.Constants.paths.htmlFiles], ['reload'])
+                gulp.watch([appUtils.Constants.paths.utils, appUtils.Constants.paths.server.config, appUtils.Constants.paths.htmlFiles.all], ['reload'])
             }
         },
 
@@ -188,7 +211,7 @@ gulp.task('start', ['minify'], function () {
     appUtils.Logger.info('building & injecting app files...');
     var verbose = args.verbose;
     $.wait(1500);
-    $.sequence([tasks.app.build(), tasks.app.config(), tasks.injectDependencies(),tasks.copy.views(), tasks.app.start(verbose || false)]);
+    $.sequence([tasks.lint.js(),tasks.app.build(), tasks.app.config(), tasks.injectDependencies(),tasks.copy.views(), tasks.app.start(verbose || false)]);
 });
 
 gulp.task('build', function () {
@@ -198,4 +221,8 @@ gulp.task('build', function () {
 
 gulp.task('reload', function () {
     tasks.app.reload.app();
+});
+
+gulp.task('serve',['start'],function(){
+return tasks.server.nodemon();
 });

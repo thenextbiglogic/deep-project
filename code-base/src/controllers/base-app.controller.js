@@ -1,10 +1,18 @@
 /**
  * Base App Controller
  */
+const utils = {
+    Logger: require('../js/app-log.util.min'),
+    Constants: require('../js/app-contants.util.min'),
+};
+
 var lastAccessed = new Date().getTime(),
     createdAt = new Date(),
-    name = 'Controller';
-var controller = Object.create();
+    name = 'Controller',
+    appName=utils.Constants.Project.Properties.Name;
+var controller = {
+};
+
 Object.defineProperty(controller, 'LastAccessed', {
     get: function () {
         return lastAccessed;
@@ -28,3 +36,11 @@ Object.defineProperty(controller, 'CreatedAt', {
         return createdAt;
     }
 });
+
+Object.defineProperty(controller, 'AppName', {
+    get: function () {
+        return appName;
+    }
+});
+
+module.exports = controller;

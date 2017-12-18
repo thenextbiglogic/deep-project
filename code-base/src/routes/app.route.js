@@ -14,6 +14,7 @@ var route = {
         utils.Logger.info('Configuring routes');
         PrepareRouteList('home');
         PrepareRouteList('node');
+        PrepareRouteList('error');
     },
     add: function (routeName) {
         PrepareRouteList(routeName);

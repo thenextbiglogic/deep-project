@@ -8,6 +8,7 @@ const utils = {
     Exception: require('../js/app-exception.util.min'),
     Status: require('../js/app-status.util.min')
 },
+baseController = require('../js/base-app.controller.min'),
 path = require('path');
 
 var name = 'Home',
@@ -15,7 +16,7 @@ var name = 'Home',
 
 var homeController = {
     Name: 'Home',
-    ViewPath: '/Home/',
+    ViewPath: 'home/',
     Configure: function (app, route) {
         var check = utils.Exception.Handle(app);
         if (check.Status === utils.Status.OK && check.Message === utils.Constants.Empty) {
@@ -29,10 +30,12 @@ var homeController = {
         res.render(path.join(dirname, utils.Constants.paths.public.views) +viewPath+ '/index.view.ejs', {
             title: 'Home Controller',
             name: name,
+            projectName:baseController.AppName,
             data: {
               Message: 'Response from Home Controller',
               Time: new Date().toString()
-            }
+            },
+            view: viewPath+'index.view.ejs'            
           });
     }
 };
@@ -52,5 +55,4 @@ Object.defineProperty(homeController, 'viewPath', {
 function Serve() {
 
 }
-
 module.exports = homeController;
