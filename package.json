@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "gulp start",
-    "start": "npm run open:src",
+    "start": "node app.js",
     "open:src":"babel-node app.js"
   },
   "repository": {
