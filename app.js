@@ -17,6 +17,7 @@ app.Server.configure.app({
 
 function setMessage(msg) {
     app.Utils.Logger.message(msg);
+    // print the server version
     app.Utils.Logger.info(app.Server.getVersion());
 }
 
