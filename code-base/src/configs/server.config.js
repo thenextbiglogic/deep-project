@@ -13,7 +13,7 @@ const utils = {
   route = require('../js/app.route.min'),
   //require(fs.existsSync('./code-base/common/public/js/app.route.min') ? './code-base/common/public/js/app.route.min' : '../routes/app.route.js'),
   express = require('express'),
-  port = process.env.port || 1304,
+  port = process.env.PORT,
   app = express(),
   viewEngine = utils.Constants.view.engine,
   path = require('path'),

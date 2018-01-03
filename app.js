@@ -4,13 +4,15 @@ var app = {
         Constants: require('./code-base/common/public/js/app-contants.util.min')
     },
     Server: require('./code-base/common/public/scripts/server.config.min.js')
-}
+};
+
+const port = process.env.PORT || 3000;
 app.Server.configure.views(__dirname);
 app.Server.configure.app({
     route: app.Utils.Constants.appRoot,
-    dirname:__dirname,
-    useViewEngine:true,
-    port:1304
+    dirname: __dirname,
+    useViewEngine: true,
+    port: port
 });
 
 function setMessage(msg) {
@@ -18,4 +20,4 @@ function setMessage(msg) {
     app.Utils.Logger.info(app.Server.getVersion());
 }
 
-setMessage(app.Server.getName());
+setMessage('App listening on port-'+port);
